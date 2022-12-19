@@ -11,4 +11,4 @@ export default {
   component: PanoramaViewer,
 };
 
-export const Pano = () => <React.Fragment><PanoramaViewer />Test</React.Fragment>;
+export const Pano = () => <PanoramaViewer />;

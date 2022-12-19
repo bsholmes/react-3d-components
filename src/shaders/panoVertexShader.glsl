@@ -1,5 +1,12 @@
+uniform mat4 uMVP;
+
+attribute vec4 aVertPos;
+attribute vec2 aTexCoords;
+
+varying vec2 vTexCoords;
+
 void main()
 {
-  gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-  gl_TexCoord[0] = gl_MultiTexCoord0;
+  gl_Position = uMVP * aVertPos;
+  vTexCoords = aTexCoords;
 }

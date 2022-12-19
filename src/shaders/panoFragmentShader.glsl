@@ -1,7 +1,10 @@
-uniform sampler2D tex2d; 
+precision highp float;
+
+uniform sampler2D uTex2d; 
+
+varying vec2 vTexCoords;
 
 void main(void)
 {
-	vec4 texColor = texture2D(tex2d,(gl_TexCoord[0].st));
-	gl_FragColor = texColor;
+	gl_FragColor = vec4(0, 0, 0, 1);//texture2D(uTex2d, vTexCoords.st);
 }
