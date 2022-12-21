@@ -1,99 +1,75 @@
-import {
-  vec4Cross,
-  vec4Sub,
-  vec4Normalize
-} from './vectorMath';
+import { DEG_TO_RAD } from "./vectorMath";
+
+export const isPowerOfTwo = (x) => {
+  return (Math.log(x)/Math.log(2)) % 1 === 0;
+}
 
 // Creates sphere vertex data given a number of segments and rings
-export const SphereModel = (segments, rings) => {
+export const SphereModel = (segments, rings, radius) => {
   let vertData = [];
   let indices = [];
 
-  // for (let i = 0; i < segments; ++i)
-  // {
-  //   for (let j = 0; j < rings; ++j)
-  //   {
+  if (segments < 3 || rings < 3) {
+    throw new Error("Sphere must have at least 3 segments and rings");
+  }
+
+  // TODO: finish sphere geo
+
+  // first vert at the bottom
+  // calculate uvs
+  vertData = [0, -radius, -radius, -10, 0.5, 0];
+  indices = [0];
+  // vertData = [...vertData, ...[radius, radius, -radius, 0, 1, 1]];
+  // indices = [...indices, 1];
+  // vertData = [...vertData, ...[0, radius, -radius, 0, 0.5, 1]];
+  // indices = [...indices, 2];
+
+  const dSegment = 180 / segments;
+  const dRing = 360 / rings;
+  
+  for (let i = 0; i < segments; ++i)
+  {
+    for (let j = 0; j < rings; ++j)
+    {
+      // one poly per-segment, per-ring
+      // the polys at the first and last ring are tris, the rest are quads
+      // or we can implement them as quads where several of the verts are in the same spot
+
+      // for each ring evenly divide the verts 
+      // sin and cos for positions?
+      vertData = [
+        ...vertData,
+        ...[
+          radius * Math.sin(i * dSegment * DEG_TO_RAD) * Math.sin(j * dRing * DEG_TO_RAD),
+          radius * Math.cos(j * dRing * DEG_TO_RAD),
+          radius * Math.sin(i * dSegment * DEG_TO_RAD) * Math.cos(j * dRing * DEG_TO_RAD) - 10,
+          0,
+          (j * dRing) / 360,
+          (i * dSegment) / 180
+        ]
+      ];
+      indices = [...indices, [i * segments + rings]];
+      indices = [...indices, [i + 1 * segments + rings]]; 
+      indices = [...indices, [i * segments + rings + 1]]; 
       
-  //   }
-  // }
+    }
+  }
+  vertData = [...vertData, ...[0, radius, -10, 0, 0.5, 1]];
+  indices = [...indices, [segments * rings]];
 
-  // vertData[0] = { position: [1, 1, 0], texCoord: [1, 1] };
-  // vertData[1] = { position: [1, 0, 0], texCoord: [1, 0] };
-  // vertData[2] = { position: [0, 0, 0], texCoord: [0, 0] };
+  // // verts and uvs
+  // vertData = [
+  //   1, 1, -1, 1, 1, 1,
+  //   1, -1, -1, 1, 1, 0,
+  //   -1, -1, -1, 1, 0, 0,
+  //   -1, 1, -1, 1, 0, 1
+  // ];
 
-  // vertData[0] = 1;
-  // vertData[1] = 1;
-  // vertData[2] = 0;
-  // vertData[3] = 0;
-  // vertData[4] = 1;
-  // vertData[5] = 1;
-
-  // vertData[6] = 1;
-  // vertData[7] = 0;
-  // vertData[8] = 0;
-  // vertData[9] = 0;
-  // vertData[10] = 1;
-  // vertData[11] = 0;
-
-  // vertData[12] = 0;
-  // vertData[13] = 0;
-  // vertData[14] = 0;
-  // vertData[15] = 0;
-  // vertData[16] = 0;
-  // vertData[17] = 0;
-
-  vertData[0] = 10;
-  vertData[1] = 10;
-  vertData[2] = 0;
-  vertData[3] = 0;
-
-  vertData[4] = 10;
-  vertData[5] = -10;
-  vertData[6] = 0;
-  vertData[7] = 0;
-
-  vertData[8] = -10;
-  vertData[9] = -10;
-  vertData[10] = 0;
-  vertData[11] = 0;
-
-  indices[0] = 0;
-  indices[1] = 1;
-  indices[2] = 2;
+  // indices = [
+  //   1, 2, 0, 3,
+  // ];
 
   return { vertData, indices };
-};
-
-export const IdentityMatrix = () => {
-  return [
-    1, 0, 0, 0,
-    0, 1, 0, 0,
-    0, 0, 1, 0,
-    0, 0, 0, 0
-  ];
-}
-
-export const ViewMatrix = (camPos, viewPos, upDir) => {
-  const forwardVec = vec4Normalize(vec4Sub(camPos, viewPos));
-	const s = -vec4Normalize(vec4Cross(forwardVec, upDir));
-	const t = vec4Normalize(vec4Cross(forwardVec,s));
-
-  return [
-    forwardVec[0], forwardVec[1], forwardVec[2], forwardVec[3],
-    s[0], s[1], s[2], s[3],
-    t[0], t[1], t[2], t[3],
-    -camPos[0], -camPos[1], -camPos[2], -camPos[3]
-  ];
-};
-
-export const ProjectionMatrix = (fov, aspect, near, far) => {
-  const f = 1 / Math.tan(fov/2);
-  return [
-    f / aspect, 0, 0, 0,
-    0, f, 0, 0,
-    0, 0, (far + near) / (near + far), (2 * far * near) / (near - far),
-    0, 0, -1, 0
-  ];
 };
 
 export const CreateAndCompileShader = (glContext, shaderSource, shaderType) => {

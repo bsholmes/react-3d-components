@@ -14,19 +14,19 @@
     "@wojtekmaj/enzyme-adapter-react-17": "^0.8.0",
     "babel-plugin-styled-components": "^1.12.0",
     "enzyme": "^3.11.0",
+    "jest": "^29.3.1",
     "jest-styled-components": "^7.0.3",
-    "react": ">= 17.0.2",
-    "react-dom": "^17.0.0",
     "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-replace": "^2.2.0",
     "styled-components": ">= 5.2.1",
     "styled-jsx": ">= 3.3.2",
-    "web-vitals": "^0.2.4"
+    "web-vitals": "^0.2.4",
+    "react": ">= 16.0.2"
   },
   "peerDependencies": {
-    "react": ">= 17.0.2",
+    "react": ">= 16.0.2",
     "styled-components": ">= 5.2.1",
     "styled-jsx": ">= 3.3.2"
   },
@@ -34,7 +34,7 @@
     "build": "npm run build:dev && npm run build:prod",
     "build:dev": "cross-env NODE_ENV=development rollup -c",
     "build:prod": "cross-env NODE_ENV=production rollup -c",
-    "test": "jest -c ../../scripts/jest/config.main.js",
+    "test": "jest",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
@@ -56,6 +56,8 @@
     "@storybook/addon-links": "^6.1.11",
     "@storybook/react": "^6.1.11",
     "babel-loader": "^8.2.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "webpack-glsl-loader": "^1.0.1"
   }
 }
