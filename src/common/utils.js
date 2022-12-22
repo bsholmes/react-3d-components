@@ -17,12 +17,8 @@ export const SphereModel = (segments, rings, radius) => {
 
   // first vert at the bottom
   // calculate uvs
-  vertData = [0, -radius, -radius, -10, 0.5, 0];
+  vertData = [0, -radius, -radius, 0, 0.5, 0];
   indices = [0];
-  // vertData = [...vertData, ...[radius, radius, -radius, 0, 1, 1]];
-  // indices = [...indices, 1];
-  // vertData = [...vertData, ...[0, radius, -radius, 0, 0.5, 1]];
-  // indices = [...indices, 2];
 
   const dSegment = 180 / segments;
   const dRing = 360 / rings;
@@ -40,22 +36,25 @@ export const SphereModel = (segments, rings, radius) => {
       vertData = [
         ...vertData,
         ...[
-          radius * Math.sin(i * dSegment * DEG_TO_RAD) * Math.sin(j * dRing * DEG_TO_RAD),
-          radius * Math.cos(j * dRing * DEG_TO_RAD),
-          radius * Math.sin(i * dSegment * DEG_TO_RAD) * Math.cos(j * dRing * DEG_TO_RAD) - 10,
+          radius * Math.sin(j * dSegment * DEG_TO_RAD) * Math.sin(i * dRing * DEG_TO_RAD),
+          radius * Math.cos(i * dRing * DEG_TO_RAD),
+          radius * Math.sin(j * dSegment * DEG_TO_RAD) * Math.cos(i * dRing * DEG_TO_RAD),
           0,
           (j * dRing) / 360,
           (i * dSegment) / 180
         ]
       ];
-      indices = [...indices, [i * segments + rings]];
-      indices = [...indices, [i + 1 * segments + rings]]; 
-      indices = [...indices, [i * segments + rings + 1]]; 
+
+      // TODO: indices are wrong, vert positions might be too
+      indices = [...indices, i * segments + rings + 1];
+      indices = [...indices, (i + 1) * segments + rings]; 
+      indices = [...indices, i * segments + rings]; 
+      // indices = [...indices, i * segments + rings - 1]; 
       
     }
   }
-  vertData = [...vertData, ...[0, radius, -10, 0, 0.5, 1]];
-  indices = [...indices, [segments * rings]];
+  vertData = [...vertData, ...[0, radius, 0, 0, 0.5, 1]];
+  indices = [...indices, segments * rings];
 
   // // verts and uvs
   // vertData = [

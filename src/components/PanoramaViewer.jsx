@@ -1,6 +1,5 @@
-import react, { useState } from 'react';
+import react, { useState, useRef   } from 'react';
 import Canvas from '../common/Canvas';
-import LimeCat from '../../static/lime-cat.jpg';
 import Example360 from '../../static/example_360.jpeg';
 import {
   CreateAndLinkProgramWithShaders,
@@ -13,6 +12,7 @@ import {
   ProjectionMatrix,
   RotationMatrix,
   ViewMatrix,
+  TranslationMatrix
 } from '../common/vectorMath';
 import panoVertexShader from '../shaders/panoVertexShader.glsl';
 import panoFragmentShader from '../shaders/panoFragmentShader.glsl';
@@ -21,9 +21,23 @@ const FLOAT_BYTE_SIZE = 4;
 
 export default () => {
   const [indexCount, setIndexCount] = useState(0);
-  const [mouseDown, setMouseDown] = useState(false);
-  const [mouseDownPos, setMouseDownPos] = useState([]);
+  const [mouseDown, _setMouseDown] = useState(false);
+  const [mouseDownPos, _setMouseDownPos] = useState([]);
   const [sphereTransformMatrix, setSphereTransformMatrix] = useState(IdentityMatrix());
+  const [glProgram, setGLProgram] = useState(null);
+
+  const mouseDownRef = useRef(mouseDown);
+  const setMouseDown = down => {
+    mouseDownRef.current = down;
+    _setMouseDown(down);
+  };
+
+  const mouseDownPosRef = useRef(mouseDownPos);
+  const setMouseDownPos = pos => {
+    mouseDownPosRef.current = pos;
+    _setMouseDownPos(pos);
+  };
+
   const draw = (gl) => {
     if (gl === null) {
       alert('WebGL not supported');
@@ -41,6 +55,24 @@ export default () => {
     gl.clear(gl.COLOR_BUFFER_BIT);
     // gl.canvas.style.opacity = alpha;
 
+    if (glProgram) {
+      //TODO: only set MVP if it has changed since last draw
+      const mvpUniform = gl.getUniformLocation(glProgram, 'uMVP');
+      gl.uniformMatrix4fv(
+        mvpUniform,
+        false,
+        new Float32Array(
+          mat4Mult(
+            sphereTransformMatrix,
+            mat4Mult(
+              ProjectionMatrix(90, gl.canvas.width / gl.canvas.height, 0.00000001, 1000),
+              ViewMatrix([0, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0])
+            ),
+          )
+        )
+      );
+    }
+
     // draw a sphere with the given image as its texture with a spherical projection
     gl.drawElements(gl.TRIANGLE_STRIP, indexCount, gl.UNSIGNED_BYTE, 0);
   };
@@ -49,6 +81,7 @@ export default () => {
     // load program
     const program = CreateAndLinkProgramWithShaders(gl, panoVertexShader, panoFragmentShader);
     gl.useProgram(program);
+    setGLProgram(program);
 
     // set uniforms, attributes, etc.
     const mvpUniform = gl.getUniformLocation(program, 'uMVP');
@@ -129,30 +162,39 @@ export default () => {
       gl.uniform1i(texUniformIndex, 0);
     };
 
-    gl.canvas.addEventListener('mousedown', function (event) {
+    gl.canvas.addEventListener('mousedown', (event) => {
         // console.log('mousedown');
         // console.log(event);
         setMouseDown(true);
         setMouseDownPos([event.clientX, event.clientY]);
     });
 
-    gl.canvas.addEventListener('mouseup', function (event) {
+    gl.canvas.addEventListener('mouseup', (event) => {
         // console.log('mouseup');
         // console.log(event);
-        // setMouseDown(false);
+        setMouseDown(false);
     });
 
-    gl.canvas.addEventListener('mousemove', function (event) {
+    gl.canvas.addEventListener('mousemove', (event) => {
       // console.log('mousemove');
       // console.log(event);
-      // console.log(mouseDown);
-      if (true) {
+      if (mouseDownRef.current) {
         // set sphereTransformMatrix rotation by mouse delta
-        const dMouse = [event.clientX - 0, event.clientY - 0];
+        
+        const dMouse = [event.clientX - mouseDownPosRef.current[0], event.clientY - mouseDownPosRef.current[1]];
 
         console.log(dMouse);
 
-        setSphereTransformMatrix(mat4Mult(RotationMatrix(dMouse[0], [1,0,0]), RotationMatrix(dMouse[1], [0,1,0])));
+
+        // setSphereTransformMatrix(mat4Mult(RotationMatrix(dMouse[0], [1,0,0]), RotationMatrix(dMouse[1], [0,1,0])));
+
+        // TODO: not working
+        setSphereTransformMatrix(
+          // mat4Mult(
+            // RotationMatrix(dMouse[0] * 0.1, [0,1,0]),
+            TranslationMatrix([0, 0, -40, 0])
+          // )
+        );
       }
   });
     

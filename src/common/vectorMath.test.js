@@ -91,7 +91,17 @@ describe('matrix math', () => {
       1094, 1218, 1342, 1466
     ];
 
+    const result2 = mat4Mult(mat2, mat1);
+    const expected2 = [
+      296, 328, 360, 392,
+      552, 616, 680, 744,
+      808, 904, 1000, 1096,
+      1064, 1192, 1320, 1448
+    ];
+
     expect(result).toEqual(expected);
+
+    expect(result2).toEqual(expected2);
   });
 
   test('mat4 Transpose', () => {
