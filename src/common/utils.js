@@ -16,8 +16,6 @@ export const SphereModel = (segments, rings, radius) => {
   const dSegment = (180 / segments) * DEG_TO_RAD;
   const dRing = (360 / rings) * DEG_TO_RAD;
   
-  // TODO:
-  // has problems with more than 15 segments/rings... why?
   for (let i = 0; i <= rings; ++i)
   {
     for (let j = 0; j <= segments; ++j)
@@ -28,7 +26,6 @@ export const SphereModel = (segments, rings, radius) => {
         Math.sin(i * dSegment) * Math.sin(j * dRing)
       ];
 
-      // console.log(`(${i}, ${j}) pos: [${v[0]}, ${v[1]}, ${v[2]}]`);
       vertData = [
         ...vertData,
         ...[
@@ -41,7 +38,7 @@ export const SphereModel = (segments, rings, radius) => {
         ]
       ];
 
-      if (((i + 1) * rings + j) === 0) {
+      if ((i * rings + j) === 0) {
         indices = [...indices, (i + 1) * rings + j]; 
       }
 

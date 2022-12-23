@@ -19,11 +19,14 @@ import panoFragmentShader from '../shaders/panoFragmentShader.glsl';
 
 const FLOAT_BYTE_SIZE = 4;
 
+const MOUSE_ROT_SPEED = 0.5;
+const Y_ROT_MIN_DEGREES = -75;
+
 export default () => {
   const [indexCount, setIndexCount] = useState(0);
   const [mouseDown, _setMouseDown] = useState(false);
   const [mouseDownPos, _setMouseDownPos] = useState([]);
-  const [rotTransform, _setRotTransform] = useState(IdentityMatrix());
+  const [rotXY, _setRotXY] = useState([0, 0]);
   const [sphereTransformMatrix, _setSphereTransformMatrix] = useState(IdentityMatrix());
   const [glProgram, setGLProgram] = useState(null);
 
@@ -39,10 +42,10 @@ export default () => {
     _setMouseDownPos(pos);
   };
 
-  const rotTransformRef = useRef(rotTransform);
-  const setRotTransform = rot => {
-    rotTransformRef.current = rot;
-    _setRotTransform(rot);
+  const rotXYRef = useRef(rotXY);
+  const setRotXY = rot => {
+    rotXYRef.current = rot;
+    _setRotXY(rot);
   };
 
   const sphereTransformMatrixRef = useRef(sphereTransformMatrix);
@@ -57,26 +60,40 @@ export default () => {
   };
 
   const mouseUpHandler = (event) => {
-    setRotTransform([...sphereTransformMatrixRef.current]);
+    setRotXY([
+      rotXYRef.current[0] + (event.clientX - mouseDownPosRef.current[0]),
+      Math.max(
+        rotXYRef.current[1] + (event.clientY - mouseDownPosRef.current[1]),
+        Y_ROT_MIN_DEGREES / MOUSE_ROT_SPEED
+      )
+    ]);
     setMouseDown(false);
   };
 
   const mouseOutHandler = (event) => {
-    setRotTransform([...sphereTransformMatrixRef.current]);
+    setRotXY([
+      rotXYRef.current[0] + (event.clientX - mouseDownPosRef.current[0]),
+      Math.max(
+        rotXYRef.current[1] + (event.clientY - mouseDownPosRef.current[1]),
+        Y_ROT_MIN_DEGREES / MOUSE_ROT_SPEED
+      )
+    ]);
     setMouseDown(false);
   };
 
   const mouseMoveHandler = (event) => {
     if (mouseDownRef.current) {
       // set sphereTransformMatrix rotation by mouse delta
-      const dMouse = [event.clientX - mouseDownPosRef.current[0], event.clientY - mouseDownPosRef.current[1]];
+      const dMouse = [
+        event.clientX - mouseDownPosRef.current[0],
+        event.clientY - mouseDownPosRef.current[1]
+      ];
+
+      // don't allow rotation past -75 in x
       setSphereTransformMatrix(
         mat4Mult(
-          rotTransformRef.current,
-          mat4Mult(
-            RotationMatrix(dMouse[0], [0,1,0]),
-            RotationMatrix(dMouse[1], [1,0,0])
-          )
+          RotationMatrix((dMouse[0] + rotXYRef.current[0]) * MOUSE_ROT_SPEED, [0,1,0]),
+          RotationMatrix(Math.max((dMouse[1] + rotXYRef.current[1]) * MOUSE_ROT_SPEED, Y_ROT_MIN_DEGREES), [1,0,0])
         )
       );
     }
@@ -88,16 +105,10 @@ export default () => {
     }
 
     // TODO:
-    // any time we set an alpha value for the clear color we need to set the element's opacity to the same value
-    // but that won't work if we're actually rendering anything
-    // because it will be transparent too
-
     // is there any way to blend with the elements behind?
 
-    // let alpha = 0.5;//(Math.sin(Date.now() / 1000) + 1) / 2;
     gl.clearColor(0.2, 0.2, 0.2, 1);
     gl.clear(gl.COLOR_BUFFER_BIT);
-    // gl.canvas.style.opacity = alpha;
 
     if (glProgram) {
       //TODO: only set MVP if it has changed since last draw
@@ -118,7 +129,7 @@ export default () => {
     }
 
     // draw a sphere with the given image as its texture with a spherical projection
-    gl.drawElements(gl.TRIANGLE_STRIP, indexCount, gl.UNSIGNED_BYTE, 0);
+    gl.drawElements(gl.TRIANGLE_STRIP, indexCount, gl.UNSIGNED_SHORT, 0);
   };
 
   const init = (gl) => {
@@ -144,7 +155,7 @@ export default () => {
     );
 
     // load model
-    const { vertData, indices } = SphereModel(15, 15, 10);
+    const { vertData, indices } = SphereModel(32, 32, 10);
 
     // Create array buffer
     const sphereGeoBuffer = gl.createBuffer();
@@ -153,7 +164,7 @@ export default () => {
     gl.bindBuffer(gl.ARRAY_BUFFER, sphereGeoBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertData), gl.STATIC_DRAW);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint8Array(indices), gl.STATIC_DRAW);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 
     const vertPosIndex = gl.getAttribLocation(program, "aVertPos");
     gl.enableVertexAttribArray(vertPosIndex);
@@ -211,13 +222,6 @@ export default () => {
     gl.canvas.addEventListener('mouseout', mouseOutHandler);
     gl.canvas.addEventListener('mousemove', mouseMoveHandler);
   };
-
-  // const exit = (canvas) => {
-  //   canvas.removeEventListener('mousedown', mouseDownHandler);
-  //   canvas.removeEventListener('mouseup', mouseUpHandler);
-  //   canvas.removeEventListener('mouseout', mouseOutHandler);
-  //   canvas.removeEventListener('mousemove', mouseMoveHandler);
-  // };
 
   return <Canvas draw={draw} options={{ contextType: 'webgl', init }} width={400} height={400}/>;
 };
