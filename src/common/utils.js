@@ -13,61 +13,111 @@ export const SphereModel = (segments, rings, radius) => {
     throw new Error("Sphere must have at least 3 segments and rings");
   }
 
-  // TODO: finish sphere geo
-
-  // first vert at the bottom
-  // calculate uvs
-  vertData = [0, -radius, -radius, 0, 0.5, 0];
-  indices = [0];
-
-  const dSegment = 180 / segments;
-  const dRing = 360 / rings;
+  const dSegment = (180 / segments) * DEG_TO_RAD;
+  const dRing = (360 / rings) * DEG_TO_RAD;
   
-  for (let i = 0; i < segments; ++i)
+  for (let i = 0; i <= rings; ++i)
   {
-    for (let j = 0; j < rings; ++j)
+    for (let j = 0; j < segments; ++j)
     {
-      // one poly per-segment, per-ring
-      // the polys at the first and last ring are tris, the rest are quads
-      // or we can implement them as quads where several of the verts are in the same spot
+      let v = [
+        Math.sin(i * dSegment) * Math.cos(j * dRing),
+        -Math.cos(i * dSegment),
+        Math.sin(i * dSegment) * Math.sin(j * dRing)
+      ];
 
-      // for each ring evenly divide the verts 
-      // sin and cos for positions?
+      // console.log(`(${i}, ${j}) pos: [${v[0]}, ${v[1]}, ${v[2]}]`);
+
       vertData = [
         ...vertData,
         ...[
-          radius * Math.sin(j * dSegment * DEG_TO_RAD) * Math.sin(i * dRing * DEG_TO_RAD),
-          radius * Math.cos(i * dRing * DEG_TO_RAD),
-          radius * Math.sin(j * dSegment * DEG_TO_RAD) * Math.cos(i * dRing * DEG_TO_RAD),
-          0,
-          (j * dRing) / 360,
-          (i * dSegment) / 180
+          radius * v[0],
+          radius * v[1],
+          radius * v[2],
+          1,
+          j / segments,
+          i / rings
         ]
       ];
 
-      // TODO: indices are wrong, vert positions might be too
-      indices = [...indices, i * segments + rings + 1];
-      indices = [...indices, (i + 1) * segments + rings]; 
-      indices = [...indices, i * segments + rings]; 
-      // indices = [...indices, i * segments + rings - 1]; 
-      
+      if (((i + 1) * rings + j) === 0) {
+        indices = [...indices, (i + 1) * rings + j]; 
+      }
+      if (i < rings) {
+        indices = [...indices, i * segments + j];
+        indices = [...indices, (i + 1) * segments + j + 1];
+      }
     }
   }
-  vertData = [...vertData, ...[0, radius, 0, 0, 0.5, 1]];
-  indices = [...indices, segments * rings];
 
-  // // verts and uvs
-  // vertData = [
-  //   1, 1, -1, 1, 1, 1,
-  //   1, -1, -1, 1, 1, 0,
-  //   -1, -1, -1, 1, 0, 0,
-  //   -1, 1, -1, 1, 0, 1
-  // ];
+  return { vertData, indices };
+};
 
-  // indices = [
-  //   1, 2, 0, 3,
-  // ];
+export const PlaneModel = (extent = 1) => {
+  // verts and uvs
+  vertData = [
+    extent,  extent,  0, 1, 1, 1,
+    extent,  -extent, 0, 1, 1, 0,
+    -extent, -extent, 0, 1, 0, 0,
+    -extent, extent,  0, 1, 0, 1
+  ];
 
+  indices = [
+    1, 2, 0, 3,
+  ];
+};
+
+// generates a cube mesh at the origin
+export const CubeModel = (sideLength) => {
+  let halfLength = sideLength / 2;
+  let vertData = [
+    // front
+    halfLength,   -halfLength,   halfLength,  1, 1, 0,
+    halfLength,   halfLength,    halfLength,  1, 1, 1,
+    -halfLength,  -halfLength,   halfLength,  1, 0, 0,
+    -halfLength,  halfLength,    halfLength,  1, 0, 1,
+
+    // left
+    -halfLength,  -halfLength,   halfLength,  1, 1, 0,
+    -halfLength,  halfLength,    halfLength,  1, 1, 1,
+    -halfLength,  -halfLength,   -halfLength, 1, 0, 0,
+    -halfLength,  halfLength,    -halfLength, 1, 0, 1,
+
+    // back
+    -halfLength,  -halfLength,   -halfLength, 1, 1, 0,
+    -halfLength,  halfLength,    -halfLength, 1, 1, 1,
+    halfLength,   -halfLength,   -halfLength, 1, 0, 0,
+    halfLength,   halfLength,    -halfLength, 1, 0, 1,
+
+    // right
+    halfLength,   -halfLength,   -halfLength, 1, 0, 1,
+    halfLength,   halfLength,    -halfLength, 1, 1, 1,
+    halfLength,   -halfLength,   halfLength,  1, 0, 0,
+    halfLength,   halfLength,    halfLength,  1, 1, 0,
+
+    // top
+    halfLength,   halfLength,    -halfLength, 1, 1, 0,
+    -halfLength,  halfLength,    -halfLength, 1, 1, 1,
+    halfLength,   halfLength,    halfLength,  1, 0, 0,
+    -halfLength,  halfLength,    halfLength,  1, 0, 1,
+
+    // bottom
+    halfLength,   -halfLength,   halfLength,  1, 1, 1,
+    -halfLength,  -halfLength,   -halfLength, 1, 1, 0,
+    -halfLength,  -halfLength,   halfLength,  1, 0, 0,
+    halfLength,   -halfLength,   -halfLength, 1, 0, 1,
+  ];
+  let indices = [
+    0, 1, 2, 3,
+    4, 5, 6, 7,
+    8, 9, 10, 11,
+    12, 13, 14, 15,
+    16, 17, 18, 19,
+    20, 21, 22, 23
+  ];
+
+  // TODO:
+  // front, half of left, bottom, back, right, top, second half of left
   return { vertData, indices };
 };
 

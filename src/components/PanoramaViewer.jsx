@@ -4,6 +4,7 @@ import Example360 from '../../static/example_360.jpeg';
 import {
   CreateAndLinkProgramWithShaders,
   SphereModel,
+  CubeModel,
   isPowerOfTwo
 } from '../common/utils';
 import {
@@ -65,9 +66,9 @@ export default () => {
           mat4Mult(
             sphereTransformMatrix,
             mat4Mult(
-              ProjectionMatrix(90, gl.canvas.width / gl.canvas.height, 0.00000001, 1000),
-              ViewMatrix([0, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0])
-            ),
+              ViewMatrix([0, 0, -1, 0], [0, 0, 1, 0], [0, 1, 0, 0]),
+              ProjectionMatrix(90, gl.canvas.width / gl.canvas.height, 0.00000001, 1000)
+            )
           )
         )
       );
@@ -90,11 +91,11 @@ export default () => {
       false,
       new Float32Array(
         mat4Mult(
+          sphereTransformMatrix,
           mat4Mult(
-            ProjectionMatrix(90, gl.canvas.width / gl.canvas.height, 0.00000001, 1000),
-            ViewMatrix([0, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0])
-          ),
-          sphereTransformMatrix
+            ViewMatrix([0, 0, -1, 0], [0, 0, 1, 0], [0, 1, 0, 0]),
+            ProjectionMatrix(90, gl.canvas.width / gl.canvas.height, 0.00000001, 1000)
+          )
         )
       )
     );
@@ -183,18 +184,19 @@ export default () => {
         
         const dMouse = [event.clientX - mouseDownPosRef.current[0], event.clientY - mouseDownPosRef.current[1]];
 
-        console.log(dMouse);
+        // console.log(dMouse);
 
 
-        // setSphereTransformMatrix(mat4Mult(RotationMatrix(dMouse[0], [1,0,0]), RotationMatrix(dMouse[1], [0,1,0])));
+        // setSphereTransformMatrix(mat4Mult(RotationMatrix(dMouse[0], [0,1,0]), RotationMatrix(dMouse[1], [1,0,0])));
+        setSphereTransformMatrix(RotationMatrix(dMouse[0] * 0.3, [0, 1, 0]));
 
-        // TODO: not working
-        setSphereTransformMatrix(
-          // mat4Mult(
-            // RotationMatrix(dMouse[0] * 0.1, [0,1,0]),
-            TranslationMatrix([0, 0, -40, 0])
-          // )
-        );
+        // setSphereTransformMatrix(
+        //   // mat4Mult(
+        //   //   TranslationMatrix([0, 0, 2]),
+        //     RotationMatrix(dMouse[0] * 0.1, [0, 1, 0])
+        //   // )
+        // );
+        // setSphereTransformMatrix(TranslationMatrix([0, 0, dMouse[0] * 0.1]));
       }
   });
     
