@@ -9,6 +9,7 @@ const useCanvas = (draw, options = {}) => {
     preDraw,
     postDraw,
     init,
+    exit
   } = options;
 
   useEffect(() => {
@@ -35,12 +36,18 @@ const useCanvas = (draw, options = {}) => {
         animationFrameId = window.requestAnimationFrame(render);
       };
       render();
-      
       return () => {
         window.cancelAnimationFrame(animationFrameId);
       };
     }
   }, [draw]);
+
+  useEffect(() => {
+    return () => {
+      const canvas = canvasRef.current;
+      exit && exit(canvas);
+    };
+  }, []);
   
   return canvasRef;
 }

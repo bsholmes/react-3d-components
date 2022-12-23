@@ -1,10 +1,10 @@
 import react, { useState, useRef   } from 'react';
 import Canvas from '../common/Canvas';
+// import Example360 from '../../static/360_1.jpg';
 import Example360 from '../../static/example_360.jpeg';
 import {
   CreateAndLinkProgramWithShaders,
   SphereModel,
-  CubeModel,
   isPowerOfTwo
 } from '../common/utils';
 import {
@@ -13,7 +13,6 @@ import {
   ProjectionMatrix,
   RotationMatrix,
   ViewMatrix,
-  TranslationMatrix
 } from '../common/vectorMath';
 import panoVertexShader from '../shaders/panoVertexShader.glsl';
 import panoFragmentShader from '../shaders/panoFragmentShader.glsl';
@@ -24,7 +23,8 @@ export default () => {
   const [indexCount, setIndexCount] = useState(0);
   const [mouseDown, _setMouseDown] = useState(false);
   const [mouseDownPos, _setMouseDownPos] = useState([]);
-  const [sphereTransformMatrix, setSphereTransformMatrix] = useState(IdentityMatrix());
+  const [rotTransform, _setRotTransform] = useState(IdentityMatrix());
+  const [sphereTransformMatrix, _setSphereTransformMatrix] = useState(IdentityMatrix());
   const [glProgram, setGLProgram] = useState(null);
 
   const mouseDownRef = useRef(mouseDown);
@@ -37,6 +37,49 @@ export default () => {
   const setMouseDownPos = pos => {
     mouseDownPosRef.current = pos;
     _setMouseDownPos(pos);
+  };
+
+  const rotTransformRef = useRef(rotTransform);
+  const setRotTransform = rot => {
+    rotTransformRef.current = rot;
+    _setRotTransform(rot);
+  };
+
+  const sphereTransformMatrixRef = useRef(sphereTransformMatrix);
+  const setSphereTransformMatrix = mat => {
+    sphereTransformMatrixRef.current = mat;
+    _setSphereTransformMatrix(mat);
+  };
+
+  const mouseDownHandler = (event) => {
+    setMouseDown(true);
+    setMouseDownPos([event.clientX, event.clientY]);
+  };
+
+  const mouseUpHandler = (event) => {
+    setRotTransform([...sphereTransformMatrixRef.current]);
+    setMouseDown(false);
+  };
+
+  const mouseOutHandler = (event) => {
+    setRotTransform([...sphereTransformMatrixRef.current]);
+    setMouseDown(false);
+  };
+
+  const mouseMoveHandler = (event) => {
+    if (mouseDownRef.current) {
+      // set sphereTransformMatrix rotation by mouse delta
+      const dMouse = [event.clientX - mouseDownPosRef.current[0], event.clientY - mouseDownPosRef.current[1]];
+      setSphereTransformMatrix(
+        mat4Mult(
+          rotTransformRef.current,
+          mat4Mult(
+            RotationMatrix(dMouse[0], [0,1,0]),
+            RotationMatrix(dMouse[1], [1,0,0])
+          )
+        )
+      );
+    }
   };
 
   const draw = (gl) => {
@@ -101,7 +144,7 @@ export default () => {
     );
 
     // load model
-    const { vertData, indices } = SphereModel(8, 8, 10);
+    const { vertData, indices } = SphereModel(15, 15, 10);
 
     // Create array buffer
     const sphereGeoBuffer = gl.createBuffer();
@@ -163,44 +206,18 @@ export default () => {
       gl.uniform1i(texUniformIndex, 0);
     };
 
-    gl.canvas.addEventListener('mousedown', (event) => {
-        // console.log('mousedown');
-        // console.log(event);
-        setMouseDown(true);
-        setMouseDownPos([event.clientX, event.clientY]);
-    });
-
-    gl.canvas.addEventListener('mouseup', (event) => {
-        // console.log('mouseup');
-        // console.log(event);
-        setMouseDown(false);
-    });
-
-    gl.canvas.addEventListener('mousemove', (event) => {
-      // console.log('mousemove');
-      // console.log(event);
-      if (mouseDownRef.current) {
-        // set sphereTransformMatrix rotation by mouse delta
-        
-        const dMouse = [event.clientX - mouseDownPosRef.current[0], event.clientY - mouseDownPosRef.current[1]];
-
-        // console.log(dMouse);
-
-
-        // setSphereTransformMatrix(mat4Mult(RotationMatrix(dMouse[0], [0,1,0]), RotationMatrix(dMouse[1], [1,0,0])));
-        setSphereTransformMatrix(RotationMatrix(dMouse[0] * 0.3, [0, 1, 0]));
-
-        // setSphereTransformMatrix(
-        //   // mat4Mult(
-        //   //   TranslationMatrix([0, 0, 2]),
-        //     RotationMatrix(dMouse[0] * 0.1, [0, 1, 0])
-        //   // )
-        // );
-        // setSphereTransformMatrix(TranslationMatrix([0, 0, dMouse[0] * 0.1]));
-      }
-  });
-    
+    gl.canvas.addEventListener('mousedown', mouseDownHandler);
+    gl.canvas.addEventListener('mouseup', mouseUpHandler);
+    gl.canvas.addEventListener('mouseout', mouseOutHandler);
+    gl.canvas.addEventListener('mousemove', mouseMoveHandler);
   };
+
+  // const exit = (canvas) => {
+  //   canvas.removeEventListener('mousedown', mouseDownHandler);
+  //   canvas.removeEventListener('mouseup', mouseUpHandler);
+  //   canvas.removeEventListener('mouseout', mouseOutHandler);
+  //   canvas.removeEventListener('mousemove', mouseMoveHandler);
+  // };
 
   return <Canvas draw={draw} options={{ contextType: 'webgl', init }} width={400} height={400}/>;
 };
