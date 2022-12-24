@@ -71,14 +71,23 @@ export default () => {
   };
 
   const mouseOutHandler = (event) => {
-    setRotXY([
-      rotXYRef.current[0] + (event.clientX - mouseDownPosRef.current[0]),
-      Math.max(
-        rotXYRef.current[1] + (event.clientY - mouseDownPosRef.current[1]),
-        Y_ROT_MIN_DEGREES / MOUSE_ROT_SPEED
-      )
-    ]);
-    setMouseDown(false);
+    if (mouseDownRef.current) {
+      setRotXY([
+        rotXYRef.current[0] + (event.clientX - mouseDownPosRef.current[0]),
+        Math.max(
+          rotXYRef.current[1] + (event.clientY - mouseDownPosRef.current[1]),
+          Y_ROT_MIN_DEGREES / MOUSE_ROT_SPEED
+        )
+      ]);
+      setMouseDown(false);
+    }
+  };
+
+  const mouseOverHandler = (event) => {
+    if (event.buttons === 1 && event.button === 0) {
+        setMouseDown(true);
+        setMouseDownPos([event.clientX, event.clientY]);
+    }
   };
 
   const mouseMoveHandler = (event) => {
@@ -220,6 +229,7 @@ export default () => {
     gl.canvas.addEventListener('mousedown', mouseDownHandler);
     gl.canvas.addEventListener('mouseup', mouseUpHandler);
     gl.canvas.addEventListener('mouseout', mouseOutHandler);
+    gl.canvas.addEventListener('mouseover', mouseOverHandler);
     gl.canvas.addEventListener('mousemove', mouseMoveHandler);
   };
 
