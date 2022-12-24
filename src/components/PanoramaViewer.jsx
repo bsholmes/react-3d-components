@@ -5,7 +5,8 @@ import Example360 from '../../static/example_360.jpeg';
 import {
   CreateAndLinkProgramWithShaders,
   SphereModel,
-  isPowerOfTwo
+  LoadTexture,
+  LoadGeometry
 } from '../common/utils';
 import {
   IdentityMatrix,
@@ -16,8 +17,6 @@ import {
 } from '../common/vectorMath';
 import panoVertexShader from '../shaders/panoVertexShader.glsl';
 import panoFragmentShader from '../shaders/panoFragmentShader.glsl';
-
-const FLOAT_BYTE_SIZE = 4;
 
 const MOUSE_ROT_SPEED = 0.5;
 const Y_ROT_MIN_DEGREES = -75;
@@ -115,6 +114,7 @@ export default () => {
 
     // TODO:
     // is there any way to blend with the elements behind?
+    // so we can have a transparent background, but opaque shapes?
 
     gl.clearColor(0.2, 0.2, 0.2, 1);
     gl.clear(gl.COLOR_BUFFER_BIT);
@@ -166,65 +166,12 @@ export default () => {
     // load model
     const { vertData, indices } = SphereModel(32, 32, 10);
 
-    // Create array buffer
-    const sphereGeoBuffer = gl.createBuffer();
-    const indexBuffer = gl.createBuffer();
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, sphereGeoBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertData), gl.STATIC_DRAW);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
-
-    const vertPosIndex = gl.getAttribLocation(program, "aVertPos");
-    gl.enableVertexAttribArray(vertPosIndex);
-    gl.vertexAttribPointer(vertPosIndex, 4, gl.FLOAT, false, 6 * FLOAT_BYTE_SIZE, 0);
-
-    const texCoordsIndex = gl.getAttribLocation(program, "aTexCoords");
-    gl.enableVertexAttribArray(texCoordsIndex);
-    gl.vertexAttribPointer(texCoordsIndex, 2, gl.FLOAT, false, 6 * FLOAT_BYTE_SIZE, 4 * FLOAT_BYTE_SIZE);
+    LoadGeometry(gl, program, vertData, indices);
 
     setIndexCount(indices.length);
 
     // load texture
-    // get width and height of image
-    let img = new Image();
-    img.src = Example360;
-
-    img.onload = () => {
-      const texture = gl.createTexture();
-      const texWidth = img.width;
-      const texHeight = img.height;
-
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-      gl.texImage2D(
-        gl.TEXTURE_2D,
-        0,
-        gl.RGBA,
-        gl.RGBA,
-        gl.UNSIGNED_BYTE,
-        img
-      );
-
-      // WebGL1 has different requirements for power of 2 images
-      // vs non power of 2 images so check if the image is a
-      // power of 2 in both dimensions.
-      if (isPowerOfTwo(texWidth) && isPowerOfTwo(texHeight)) {
-        // Yes, it's a power of 2. Generate mips.
-        gl.generateMipmap(gl.TEXTURE_2D);
-      } else {
-        // No, it's not a power of 2. Turn off mips and set
-        // wrapping to clamp to edge
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      }
-
-      const texUniformIndex = gl.getUniformLocation(program, 'uTex2d');
-      
-      gl.uniform1i(texUniformIndex, 0);
-    };
+    LoadTexture(gl, program, Example360, 0);
 
     gl.canvas.addEventListener('mousedown', mouseDownHandler);
     gl.canvas.addEventListener('mouseup', mouseUpHandler);

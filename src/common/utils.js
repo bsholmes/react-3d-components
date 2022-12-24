@@ -1,4 +1,8 @@
-import { DEG_TO_RAD } from "./vectorMath";
+import { DEG_TO_RAD } from './vectorMath';
+import {
+  TEXTURE_SLOTS,
+  FLOAT_BYTE_SIZE
+} from './constants';
 
 export const isPowerOfTwo = (x) => {
   return (Math.log(x)/Math.log(2)) % 1 === 0;
@@ -152,4 +156,68 @@ export const CreateAndLinkProgramWithShaders = (glContext, vertShaderSource, fra
   }
 
   return program;
+};
+
+export const LoadTexture = (gl, program, image, textureIndex = 0) => {
+  // load texture
+  // get width and height of image
+  let img = new Image();
+  img.src = image;
+
+  img.onload = () => {
+    const texture = gl.createTexture();
+    const texWidth = img.width;
+    const texHeight = img.height;
+
+    gl.activeTexture(TEXTURE_SLOTS[textureIndex]);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      img
+    );
+
+    // WebGL1 has different requirements for power of 2 images
+    // vs non power of 2 images so check if the image is a
+    // power of 2 in both dimensions.
+    if (isPowerOfTwo(texWidth) && isPowerOfTwo(texHeight)) {
+      // Yes, it's a power of 2. Generate mips.
+      gl.generateMipmap(gl.TEXTURE_2D);
+    } else {
+      // No, it's not a power of 2. Turn off mips and set
+      // wrapping to clamp to edge
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    }
+
+    const texUniformIndex = gl.getUniformLocation(program, 'uTex2d');
+    
+    gl.uniform1i(texUniformIndex, textureIndex);
+  };
+};
+
+// currently supports 4-component verts interlaced with 2-component UVs
+// add normals, tangents, colors, etc?
+export const LoadGeometry = (gl, program, vertData, indices) => {
+  // Create array buffer
+  const geoBuffer = gl.createBuffer();
+  const indexBuffer = gl.createBuffer();
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, geoBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertData), gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+
+  const vertPosIndex = gl.getAttribLocation(program, "aVertPos");
+  gl.enableVertexAttribArray(vertPosIndex);
+  gl.vertexAttribPointer(vertPosIndex, 4, gl.FLOAT, false, 6 * FLOAT_BYTE_SIZE, 0);
+
+  const texCoordsIndex = gl.getAttribLocation(program, "aTexCoords");
+  gl.enableVertexAttribArray(texCoordsIndex);
+  gl.vertexAttribPointer(texCoordsIndex, 2, gl.FLOAT, false, 6 * FLOAT_BYTE_SIZE, 4 * FLOAT_BYTE_SIZE);
 };
