@@ -1,6 +1,5 @@
 import { useState, useRef } from 'react';
 import Canvas from '../common/Canvas';
-import Example360 from '../../static/360_2.jpg';
 import {
   CreateAndLinkProgramWithShaders,
   SphereModel,
@@ -20,7 +19,7 @@ import panoFragmentShader from '../shaders/panoFragmentShader.glsl';
 const MOUSE_ROT_SPEED = 0.5;
 const Y_ROT_MIN_DEGREES = -75;
 
-export default () => {
+export default ({ image }) => {
   const [indexCount, setIndexCount] = useState(0);
   const [mouseDown, _setMouseDown] = useState(false);
   const [mouseDownPos, _setMouseDownPos] = useState([]);
@@ -168,7 +167,7 @@ export default () => {
     setIndexCount(indices.length);
 
     // load texture
-    LoadTexture(gl, program, Example360, 0);
+    LoadTexture(gl, program, image, 0);
 
     gl.canvas.addEventListener('mousedown', mouseDownHandler);
     gl.canvas.addEventListener('mouseup', mouseUpHandler);

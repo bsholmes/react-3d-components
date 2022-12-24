@@ -1,14 +1,14 @@
 import React from 'react';
-import Example360 from '../../static/360_2.jpg';
-import PanoramaViewer from './PanoramaViewer';
+import Example360 from '../../static/example_360.jpeg';
+import BannerWave from './BannerWave';
 
 export default {
   /* 👇 The title prop is optional.
   * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
   * to learn how to generate automatic titles
   */
-  title: 'PanoramaViewer',
-  component: PanoramaViewer
+  title: 'BannerWave',
+  component: BannerWave
 };
 
-export const Pano = () => <PanoramaViewer image={Example360} />;
+export const Banner = () => <BannerWave image={Example360} />;

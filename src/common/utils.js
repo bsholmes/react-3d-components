@@ -52,18 +52,55 @@ export const SphereModel = (segments, rings, radius) => {
   return { vertData, indices };
 };
 
-export const PlaneModel = (extent = 1) => {
+export const PlaneModel = (xSegments, ySegments, extents = [1, 1]) => {
   // verts and uvs
-  const vertData = [
-    extent, extent, 0, 1, 1, 1,
-    extent, -extent, 0, 1, 1, 0,
-    -extent, -extent, 0, 1, 0, 0,
-    -extent, extent, 0, 1, 0, 1
-  ];
+  let vertData = [];
+  //   extents[0], extents[1], 0, 1, 1, 1,
+  //   extents[0], -extents[1], 0, 1, 1, 0,
+  //   -extents[0], -extents[1], 0, 1, 0, 0,
+  //   -extents[0], extents[1], 0, 1, 0, 1
+  // ];
 
-  const indices = [
-    1, 2, 0, 3
-  ];
+  let indices = [];
+  //   1, 2, 0, 3
+  // ];
+
+  let halfX = extents[0] / 2;
+  let halfY = extents[1] / 2;
+
+  for (let i = 0; i <= ySegments; ++i) {
+    for (let j = 0; j <= xSegments; ++j) {
+      vertData = [
+        ...vertData,
+        -halfX + extents[0] * (j / xSegments),
+        -halfY + extents[1] * (i / ySegments),
+        5,
+        1,
+        j / xSegments,
+        i / ySegments
+      ];
+
+      // if ((i * ySegments + j) === 0) {
+      //   indices = [...indices, (i + 1) * ySegments + j + 1];
+      // }
+
+      // indices = [...indices, i * ySegments + j];
+      // indices = [...indices, (i + 1) * ySegments + j + 2];
+
+      // for a strip we need to spiral inwards
+      // start from 0, 0
+      // make a quad
+      // go up to 0, 1
+      // keep making quads and going up until you reach the top
+      // go right until end
+      // go down until end
+      // go left until end, less the first quad we already made
+      // if there are more then go inwards and do the same process (resursive)
+
+    }
+  }
+
+  console.log(indices);
 
   return { vertData, indices };
 };
