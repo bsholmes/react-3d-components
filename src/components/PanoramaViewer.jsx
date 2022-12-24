@@ -1,7 +1,6 @@
-import react, { useState, useRef   } from 'react';
+import { useState, useRef } from 'react';
 import Canvas from '../common/Canvas';
-// import Example360 from '../../static/360_1.jpg';
-import Example360 from '../../static/example_360.jpeg';
+import Example360 from '../../static/360_2.jpg';
 import {
   CreateAndLinkProgramWithShaders,
   SphereModel,
@@ -13,7 +12,7 @@ import {
   mat4Mult,
   ProjectionMatrix,
   RotationMatrix,
-  ViewMatrix,
+  ViewMatrix
 } from '../common/vectorMath';
 import panoVertexShader from '../shaders/panoVertexShader.glsl';
 import panoFragmentShader from '../shaders/panoFragmentShader.glsl';
@@ -54,6 +53,7 @@ export default () => {
   };
 
   const mouseDownHandler = (event) => {
+    event.preventDefault();
     setMouseDown(true);
     setMouseDownPos([event.clientX, event.clientY]);
   };
@@ -84,8 +84,8 @@ export default () => {
 
   const mouseOverHandler = (event) => {
     if (event.buttons === 1 && event.button === 0) {
-        setMouseDown(true);
-        setMouseDownPos([event.clientX, event.clientY]);
+      setMouseDown(true);
+      setMouseDownPos([event.clientX, event.clientY]);
     }
   };
 
@@ -100,8 +100,8 @@ export default () => {
       // don't allow rotation past -75 in x
       setSphereTransformMatrix(
         mat4Mult(
-          RotationMatrix((dMouse[0] + rotXYRef.current[0]) * MOUSE_ROT_SPEED, [0,1,0]),
-          RotationMatrix(Math.max((dMouse[1] + rotXYRef.current[1]) * MOUSE_ROT_SPEED, Y_ROT_MIN_DEGREES), [1,0,0])
+          RotationMatrix((dMouse[0] + rotXYRef.current[0]) * MOUSE_ROT_SPEED, [0, 1, 0]),
+          RotationMatrix(Math.max((dMouse[1] + rotXYRef.current[1]) * MOUSE_ROT_SPEED, Y_ROT_MIN_DEGREES), [1, 0, 0])
         )
       );
     }
@@ -109,18 +109,15 @@ export default () => {
 
   const draw = (gl) => {
     if (gl === null) {
-      alert('WebGL not supported');
+      window.alert('WebGL not supported');
     }
 
-    // TODO:
-    // is there any way to blend with the elements behind?
-    // so we can have a transparent background, but opaque shapes?
-
-    gl.clearColor(0.2, 0.2, 0.2, 1);
+    // clear to transparent black so we can blend with background elements
+    gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     if (glProgram) {
-      //TODO: only set MVP if it has changed since last draw
+      // TODO: only set MVP if it has changed since last draw
       const mvpUniform = gl.getUniformLocation(glProgram, 'uMVP');
       gl.uniformMatrix4fv(
         mvpUniform,
@@ -180,5 +177,9 @@ export default () => {
     gl.canvas.addEventListener('mousemove', mouseMoveHandler);
   };
 
-  return <Canvas draw={draw} options={{ contextType: 'webgl', init }} width={400} height={400}/>;
+  // TODO:
+  // accept component(s) in props that can render over the 360 pano
+  // converting image space positions to polar coordinate positions
+  // so they can be placed over the 360 correctly and can move when the sphere is rotated
+  return <Canvas draw={draw} options={{ contextType: 'webgl', init }} width={400} height={400} />;
 };

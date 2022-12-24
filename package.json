@@ -34,7 +34,9 @@
     "build": "npm run build:dev && npm run build:prod",
     "build:dev": "cross-env NODE_ENV=development rollup -c",
     "build:prod": "cross-env NODE_ENV=production rollup -c",
-    "test": "jest",
+    "lint": "semistandard",
+    "lint:fix": "semistandard --fix",
+    "test": "npm run lint && jest",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
@@ -58,6 +60,7 @@
     "babel-loader": "^8.2.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "webpack-glsl-loader": "^1.0.1"
+    "webpack-glsl-loader": "^1.0.1",
+    "semistandard": "16.0.1"
   }
 }

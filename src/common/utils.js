@@ -5,8 +5,8 @@ import {
 } from './constants';
 
 export const isPowerOfTwo = (x) => {
-  return (Math.log(x)/Math.log(2)) % 1 === 0;
-}
+  return (Math.log(x) / Math.log(2)) % 1 === 0;
+};
 
 // Creates sphere vertex data given a number of segments and rings
 export const SphereModel = (segments, rings, radius) => {
@@ -14,17 +14,15 @@ export const SphereModel = (segments, rings, radius) => {
   let indices = [];
 
   if (segments < 3 || rings < 3) {
-    throw new Error("Sphere must have at least 3 segments and rings");
+    throw new Error('Sphere must have at least 3 segments and rings');
   }
 
   const dSegment = (180 / segments) * DEG_TO_RAD;
   const dRing = (360 / rings) * DEG_TO_RAD;
-  
-  for (let i = 0; i <= rings; ++i)
-  {
-    for (let j = 0; j <= segments; ++j)
-    {
-      let v = [
+
+  for (let i = 0; i <= rings; ++i) {
+    for (let j = 0; j <= segments; ++j) {
+      const v = [
         Math.sin(i * dSegment) * Math.cos(j * dRing),
         -Math.cos(i * dSegment),
         Math.sin(i * dSegment) * Math.sin(j * dRing)
@@ -43,7 +41,7 @@ export const SphereModel = (segments, rings, radius) => {
       ];
 
       if ((i * rings + j) === 0) {
-        indices = [...indices, (i + 1) * rings + j]; 
+        indices = [...indices, (i + 1) * rings + j];
       }
 
       indices = [...indices, i * segments + j];
@@ -56,59 +54,61 @@ export const SphereModel = (segments, rings, radius) => {
 
 export const PlaneModel = (extent = 1) => {
   // verts and uvs
-  vertData = [
-    extent,  extent,  0, 1, 1, 1,
-    extent,  -extent, 0, 1, 1, 0,
+  const vertData = [
+    extent, extent, 0, 1, 1, 1,
+    extent, -extent, 0, 1, 1, 0,
     -extent, -extent, 0, 1, 0, 0,
-    -extent, extent,  0, 1, 0, 1
+    -extent, extent, 0, 1, 0, 1
   ];
 
-  indices = [
-    1, 2, 0, 3,
+  const indices = [
+    1, 2, 0, 3
   ];
+
+  return { vertData, indices };
 };
 
 // generates a cube mesh at the origin
 export const CubeModel = (sideLength) => {
-  let halfLength = sideLength / 2;
-  let vertData = [
+  const halfLength = sideLength / 2;
+  const vertData = [
     // front
-    halfLength,   -halfLength,   halfLength,  1, 1, 0,
-    halfLength,   halfLength,    halfLength,  1, 1, 1,
-    -halfLength,  -halfLength,   halfLength,  1, 0, 0,
-    -halfLength,  halfLength,    halfLength,  1, 0, 1,
+    halfLength, -halfLength, halfLength, 1, 1, 0,
+    halfLength, halfLength, halfLength, 1, 1, 1,
+    -halfLength, -halfLength, halfLength, 1, 0, 0,
+    -halfLength, halfLength, halfLength, 1, 0, 1,
 
     // left
-    -halfLength,  -halfLength,   halfLength,  1, 1, 0,
-    -halfLength,  halfLength,    halfLength,  1, 1, 1,
-    -halfLength,  -halfLength,   -halfLength, 1, 0, 0,
-    -halfLength,  halfLength,    -halfLength, 1, 0, 1,
+    -halfLength, -halfLength, halfLength, 1, 1, 0,
+    -halfLength, halfLength, halfLength, 1, 1, 1,
+    -halfLength, -halfLength, -halfLength, 1, 0, 0,
+    -halfLength, halfLength, -halfLength, 1, 0, 1,
 
     // back
-    -halfLength,  -halfLength,   -halfLength, 1, 1, 0,
-    -halfLength,  halfLength,    -halfLength, 1, 1, 1,
-    halfLength,   -halfLength,   -halfLength, 1, 0, 0,
-    halfLength,   halfLength,    -halfLength, 1, 0, 1,
+    -halfLength, -halfLength, -halfLength, 1, 1, 0,
+    -halfLength, halfLength, -halfLength, 1, 1, 1,
+    halfLength, -halfLength, -halfLength, 1, 0, 0,
+    halfLength, halfLength, -halfLength, 1, 0, 1,
 
     // right
-    halfLength,   -halfLength,   -halfLength, 1, 0, 1,
-    halfLength,   halfLength,    -halfLength, 1, 1, 1,
-    halfLength,   -halfLength,   halfLength,  1, 0, 0,
-    halfLength,   halfLength,    halfLength,  1, 1, 0,
+    halfLength, -halfLength, -halfLength, 1, 0, 1,
+    halfLength, halfLength, -halfLength, 1, 1, 1,
+    halfLength, -halfLength, halfLength, 1, 0, 0,
+    halfLength, halfLength, halfLength, 1, 1, 0,
 
     // top
-    halfLength,   halfLength,    -halfLength, 1, 1, 0,
-    -halfLength,  halfLength,    -halfLength, 1, 1, 1,
-    halfLength,   halfLength,    halfLength,  1, 0, 0,
-    -halfLength,  halfLength,    halfLength,  1, 0, 1,
+    halfLength, halfLength, -halfLength, 1, 1, 0,
+    -halfLength, halfLength, -halfLength, 1, 1, 1,
+    halfLength, halfLength, halfLength, 1, 0, 0,
+    -halfLength, halfLength, halfLength, 1, 0, 1,
 
     // bottom
-    halfLength,   -halfLength,   halfLength,  1, 1, 1,
-    -halfLength,  -halfLength,   -halfLength, 1, 1, 0,
-    -halfLength,  -halfLength,   halfLength,  1, 0, 0,
-    halfLength,   -halfLength,   -halfLength, 1, 0, 1,
+    halfLength, -halfLength, halfLength, 1, 1, 1,
+    -halfLength, -halfLength, -halfLength, 1, 1, 0,
+    -halfLength, -halfLength, halfLength, 1, 0, 0,
+    halfLength, -halfLength, -halfLength, 1, 0, 1
   ];
-  let indices = [
+  const indices = [
     0, 1, 2, 3,
     4, 5, 6, 7,
     8, 9, 10, 11,
@@ -127,10 +127,10 @@ export const CreateAndCompileShader = (glContext, shaderSource, shaderType) => {
   glContext.shaderSource(shader, shaderSource);
   glContext.compileShader(shader);
 
-  let shaderCompileStatus = glContext.getShaderParameter(shader, glContext.COMPILE_STATUS);
+  const shaderCompileStatus = glContext.getShaderParameter(shader, glContext.COMPILE_STATUS);
 
   if (!shaderCompileStatus) {
-    let shaderInfoLog = glContext.getShaderInfoLog(shader);
+    const shaderInfoLog = glContext.getShaderInfoLog(shader);
 
     console.error(`shader failed to compile \n\n${shaderInfoLog}`);
   }
@@ -141,13 +141,13 @@ export const CreateAndCompileShader = (glContext, shaderSource, shaderType) => {
 export const CreateAndLinkProgramWithShaders = (glContext, vertShaderSource, fragShaderSource) => {
   const program = glContext.createProgram();
 
-  let vertexShader = CreateAndCompileShader(glContext, vertShaderSource, glContext.VERTEX_SHADER);
-  let fragmentShader = CreateAndCompileShader(glContext, fragShaderSource, glContext.FRAGMENT_SHADER);
+  const vertexShader = CreateAndCompileShader(glContext, vertShaderSource, glContext.VERTEX_SHADER);
+  const fragmentShader = CreateAndCompileShader(glContext, fragShaderSource, glContext.FRAGMENT_SHADER);
 
   // Attach pre-existing shaders
   glContext.attachShader(program, vertexShader);
   glContext.attachShader(program, fragmentShader);
-  
+
   glContext.linkProgram(program);
 
   if (!glContext.getProgramParameter(program, glContext.LINK_STATUS)) {
@@ -161,7 +161,7 @@ export const CreateAndLinkProgramWithShaders = (glContext, vertShaderSource, fra
 export const LoadTexture = (gl, program, image, textureIndex = 0) => {
   // load texture
   // get width and height of image
-  let img = new Image();
+  const img = new Image();
   img.src = image;
 
   img.onload = () => {
@@ -169,7 +169,7 @@ export const LoadTexture = (gl, program, image, textureIndex = 0) => {
     const texWidth = img.width;
     const texHeight = img.height;
 
-    gl.activeTexture(TEXTURE_SLOTS[textureIndex]);
+    gl.activeTexture(TEXTURE_SLOTS(gl)[textureIndex]);
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     gl.texImage2D(
@@ -196,7 +196,7 @@ export const LoadTexture = (gl, program, image, textureIndex = 0) => {
     }
 
     const texUniformIndex = gl.getUniformLocation(program, 'uTex2d');
-    
+
     gl.uniform1i(texUniformIndex, textureIndex);
   };
 };
@@ -213,11 +213,11 @@ export const LoadGeometry = (gl, program, vertData, indices) => {
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 
-  const vertPosIndex = gl.getAttribLocation(program, "aVertPos");
+  const vertPosIndex = gl.getAttribLocation(program, 'aVertPos');
   gl.enableVertexAttribArray(vertPosIndex);
   gl.vertexAttribPointer(vertPosIndex, 4, gl.FLOAT, false, 6 * FLOAT_BYTE_SIZE, 0);
 
-  const texCoordsIndex = gl.getAttribLocation(program, "aTexCoords");
+  const texCoordsIndex = gl.getAttribLocation(program, 'aTexCoords');
   gl.enableVertexAttribArray(texCoordsIndex);
   gl.vertexAttribPointer(texCoordsIndex, 2, gl.FLOAT, false, 6 * FLOAT_BYTE_SIZE, 4 * FLOAT_BYTE_SIZE);
 };

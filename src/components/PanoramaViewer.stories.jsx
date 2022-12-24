@@ -8,7 +8,7 @@ export default {
   * to learn how to generate automatic titles
   */
   title: 'PanoramaViewer',
-  component: PanoramaViewer,
+  component: PanoramaViewer
 };
 
 export const Pano = () => <PanoramaViewer />;

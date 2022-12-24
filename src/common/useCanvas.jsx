@@ -20,14 +20,14 @@ const useCanvas = (draw, options = {}) => {
       init && init(ctx);
     }
   }, [canvasRef]);
-  
+
   useEffect(() => {
     if (canvasRef) {
       const canvas = canvasRef.current;
       const ctx = canvas.getContext(contextType || DEFAULT_CONTEXT_TYPE);
       let frameCount = 0;
       let animationFrameId;
-      
+
       const render = () => {
         frameCount++;
         preDraw && preDraw();
@@ -48,8 +48,8 @@ const useCanvas = (draw, options = {}) => {
       exit && exit(canvas);
     };
   }, []);
-  
+
   return canvasRef;
-}
+};
 
 export default useCanvas;

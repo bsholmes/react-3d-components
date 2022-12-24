@@ -20,42 +20,12 @@ const plugins = [
 const external = id => /^react|styled-jsx|styled-components/.test(id);
 
 export default [
-  // // Media
-  // {
-  //   input: 'src/media/MediaRender.js',
-  //   external,
-  //   output: {
-  //     file: outputFolder + 'MediaRender.js'
-  //   },
-  //   plugins
-  // },
-
-  // {
-  //   input: 'src/media/RenderToggle.js',
-  //   external,
-  //   output: {
-  //     file: outputFolder + 'RenderToggle.js'
-  //   },
-  //   plugins
-  // },
-
-  // // Rendered components
-  // {
-  //   input: 'src/components/ProgressCircle.js',
-  //   external,
-  //   output: {
-  //     file: outputFolder + 'ProgressCircle.js'
-  //   },
-  //   plugins
-  // },
-
-  // // Input Components
-  // {
-  //   input: 'src/components/input/Toggle.js',
-  //   external,
-  //   output: {
-  //     file: outputFolder + 'Toggle.js'
-  //   },
-  //   plugins
-  // }
+  {
+    input: 'src/components/PanoramaViewer.js',
+    external,
+    output: {
+      file: outputFolder + 'PanoramaViewer.js'
+    },
+    plugins
+  }
 ];

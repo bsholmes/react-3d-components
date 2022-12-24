@@ -12,7 +12,7 @@ export const TEXTURE_SLOTS = (gl) => [
   gl.TEXTURE9,
   gl.TEXTURE10,
   gl.TEXTURE11,
-  gl.TEXTURE12,
+  gl.TEXTURE12
 ];
 
 export const FLOAT_BYTE_SIZE = 4;
