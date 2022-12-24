@@ -1,5 +1,5 @@
 import React from 'react';
-import Example360 from '../../static/example_360.jpeg';
+import BannerJPG from '../../static/banner.jpg';
 import BannerWave from './BannerWave';
 
 export default {
@@ -11,4 +11,4 @@ export default {
   component: BannerWave
 };
 
-export const Banner = () => <BannerWave image={Example360} />;
+export const Banner = () => <BannerWave image={BannerJPG} width={600} height={150} />;

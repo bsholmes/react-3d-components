@@ -2,10 +2,10 @@ import { useState, useRef } from 'react';
 import Canvas from '../common/Canvas';
 import {
   CreateAndLinkProgramWithShaders,
-  SphereModel,
   LoadTexture,
   LoadGeometry
 } from '../common/utils';
+import { SphereModel } from '../common/proceduralMeshes';
 import {
   IdentityMatrix,
   mat4Mult,
