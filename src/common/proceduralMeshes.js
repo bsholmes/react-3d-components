@@ -44,7 +44,7 @@ export const SphereModel = (segments, rings, radius) => {
   return { vertData, indices };
 };
 
-export const PlaneModel = (xSegments, ySegments, extents = [1, 1]) => {
+export const PlaneModel = (xSegments, ySegments, extents = [1, 1, 1]) => {
   // verts and uvs
   let vertData = [];
   let indices = [];
@@ -102,7 +102,7 @@ export const PlaneModel = (xSegments, ySegments, extents = [1, 1]) => {
             _indices = [..._indices, j + (_start[1] - direction) * (xSegments + 1)];
             _indices = [..._indices,  (j + direction) + _start[1] * (xSegments + 1)];
           }
-          _indices = [..._indices, Math.max(segments, 0) + (_start[1] - direction) * (xSegments + 1)];
+          _indices = [..._indices, Math.max(segments - negDirColumns, 0) + (_start[1] - direction) * (xSegments + 1)];
         }
         else {
           for (j = _start[0]; j > Math.max(segments, posDirColumns); j += direction) {
@@ -113,7 +113,7 @@ export const PlaneModel = (xSegments, ySegments, extents = [1, 1]) => {
         }
         _rows++;
 
-        if (_columns === xSegments && _rows === ySegments) {
+        if (_columns === xSegments || _rows === ySegments) {
           return _indices;
         }
 
@@ -140,11 +140,11 @@ export const PlaneModel = (xSegments, ySegments, extents = [1, 1]) => {
             _indices = [..._indices, (_start[0] + direction) + j * (xSegments + 1)];
             _indices = [..._indices, _start[0] + (j + direction) * (xSegments + 1)];
           }
-          _indices = [..._indices, (_start[0] + direction) + (Math.max(segments, 0)) * (xSegments + 1)];
+          _indices = [..._indices, (_start[0] + direction) + (Math.max(segments, negDirRows)) * (xSegments + 1)];
         }
         _columns++;
 
-        if (_columns === xSegments && _rows === ySegments) {
+        if (_columns === xSegments || _rows === ySegments) {
           return _indices;
         }
         let negDirRows = _rows - posDirRows;

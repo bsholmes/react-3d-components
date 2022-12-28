@@ -37,31 +37,26 @@ export default ({ image, ...rest }) => {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     if (glProgram) {
-      // TODO: only set MVP if it has changed since last draw
-      const mvpUniform = gl.getUniformLocation(glProgram, 'uMVP');
-      gl.uniformMatrix4fv(
-        mvpUniform,
-        false,
-        new Float32Array(
-          mat4Mult(
-            ViewMatrix(CAM_POS, CAM_TARGET, CAM_UP),
-            ProjectionMatrix(90, gl.canvas.width / gl.canvas.height, 0.00000001, 1000)
-          )
-        )
-      );
+      const { width, height } = getViewWidthHeightAtZ(90, gl.canvas.width / gl.canvas.height, 1);
 
-      // animate
+      // animate vert data
       let animatedVerts = [...planeModelVerts];
-      const widthScale = (600 / rest.width);
-      const heightScale = (200 / rest.height);
+      const widthScale = (2 / width);
+      const heightScale = (1 / height);
       for (let i = 2; i < planeModelVerts.length; i += 6) {
         animatedVerts[i - 2] = planeModelVerts[i - 2] + Math.sin((Date.now() / 500) + planeModelVerts[i - 2] * 0.7 * widthScale) * 0.05;
         animatedVerts[i - 1] = planeModelVerts[i - 1] + Math.sin((Date.now() / 500) + planeModelVerts[i - 1] * 0.7 * heightScale) * 0.05;
         animatedVerts[i] = planeModelVerts[i] + Math.sin(
-          (Date.now() / 500) - 
-          planeModelVerts[i - 2] * 0.3 * widthScale + 
-          planeModelVerts[i - 1] * 0.1 * heightScale
-        ) * 0.5;
+          ((Date.now() / 500) - 
+          (planeModelVerts[i - 2] * 2 * widthScale)) + 
+          (planeModelVerts[i - 1] * 0.66 * heightScale)
+        ) * 0.25 +
+        // smaller ripple
+        Math.max(Math.sin(
+          (Date.now() / 200) -
+          (planeModelVerts[i - 2] * 4 * widthScale)
+        ), 0) * 0.1
+        ;
       }
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(animatedVerts), gl.STATIC_DRAW);
     }
@@ -72,7 +67,7 @@ export default ({ image, ...rest }) => {
 
   const init = (gl) => {
     // load program
-    // TODO: write shaders that use lighting
+    // TODO: write shaders that use lighting, and generate normals
     const program = CreateAndLinkProgramWithShaders(gl, panoVertexShader, panoFragmentShader);
     gl.useProgram(program);
     setGLProgram(program);
@@ -91,12 +86,10 @@ export default ({ image, ...rest }) => {
     );
 
     // load model
-    // TODO: make extents match the view frustum at the given z-pos
+    // make extents match the view frustum at the given z-pos
     // so the banner matches the canvas size
     const { width, height } = getViewWidthHeightAtZ(90, gl.canvas.width / gl.canvas.height, 1);
-    console.log(`width ${width}`);
-    console.log(`height ${height}`);
-    const { vertData, indices } = PlaneModel(18, 18, [width * 1.5, height, 1.5]);
+    const { vertData, indices } = PlaneModel(18, 18, [width * 1.75, height * 1.5, 1]);
 
     setPlaneModelVerts(vertData);
 

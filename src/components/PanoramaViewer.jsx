@@ -1,4 +1,8 @@
-import { useState, useRef } from 'react';
+import {
+  useState,
+  useRef,
+  useMemo
+} from 'react';
 import Canvas from '../common/Canvas';
 import {
   CreateAndLinkProgramWithShaders,
@@ -25,6 +29,7 @@ export default ({ image }) => {
   const [mouseDownPos, _setMouseDownPos] = useState([]);
   const [rotXY, _setRotXY] = useState([0, 0]);
   const [sphereTransformMatrix, _setSphereTransformMatrix] = useState(IdentityMatrix());
+  const [sphereTransformDirty, setSphereTransformDirty] = useState(true);
   const [glProgram, setGLProgram] = useState(null);
 
   const mouseDownRef = useRef(mouseDown);
@@ -103,6 +108,7 @@ export default ({ image }) => {
           RotationMatrix(Math.max((dMouse[1] + rotXYRef.current[1]) * MOUSE_ROT_SPEED, Y_ROT_MIN_DEGREES), [1, 0, 0])
         )
       );
+      setSphereTransformDirty(true);
     }
   };
 
@@ -115,8 +121,8 @@ export default ({ image }) => {
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    if (glProgram) {
-      // TODO: only set MVP if it has changed since last draw
+    if (glProgram && sphereTransformDirty) {
+      // only set MVP if it has changed since last draw
       const mvpUniform = gl.getUniformLocation(glProgram, 'uMVP');
       gl.uniformMatrix4fv(
         mvpUniform,
@@ -131,6 +137,7 @@ export default ({ image }) => {
           )
         )
       );
+      setSphereTransformDirty(false);
     }
 
     // draw a sphere with the given image as its texture with a spherical projection

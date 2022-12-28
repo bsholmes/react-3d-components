@@ -11,4 +11,4 @@ export default {
   component: BannerWave
 };
 
-export const Banner = () => <BannerWave image={BannerJPG} width={600} height={150} />;
+export const Banner = () => <BannerWave image={BannerJPG} width={470} height={191} />;
