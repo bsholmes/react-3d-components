@@ -1,7 +1,6 @@
 import {
   useState,
-  useRef,
-  useMemo
+  useRef
 } from 'react';
 import Canvas from '../common/Canvas';
 import {
@@ -9,7 +8,7 @@ import {
   LoadTexture,
   LoadGeometry
 } from '../common/utils';
-import { SphereModel } from '../common/proceduralMeshes';
+import { SphereModel } from '../common/geometry/proceduralMeshes';
 import {
   IdentityMatrix,
   mat4Mult,
@@ -169,7 +168,7 @@ export default ({ image }) => {
     // load model
     const { vertData, indices } = SphereModel(32, 32, 10);
 
-    LoadGeometry(gl, program, vertData, indices);
+    LoadGeometry(gl, program, vertData, indices, 4, 2);
 
     setIndexCount(indices.length);
 

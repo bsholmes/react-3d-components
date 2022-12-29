@@ -7,6 +7,6 @@ varying vec2 vTexCoords;
 
 void main()
 {
-  gl_Position = uMVP * aVertPos;
+  gl_Position = uMVP * vec4(aVertPos.xyz, 1);
   vTexCoords = aTexCoords;
 }

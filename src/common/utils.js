@@ -89,7 +89,7 @@ export const LoadTexture = (gl, program, image, textureIndex = 0) => {
 
 // currently supports 4-component verts interlaced with 2-component UVs
 // add normals, tangents, colors, etc?
-export const LoadGeometry = (gl, program, vertData, indices) => {
+export const LoadGeometry = (gl, program, vertData, indices, vertComponentNum = 4, texCoordComponentNum = 2) => {
   // Create array buffer
   const geoBuffer = gl.createBuffer();
   const indexBuffer = gl.createBuffer();
@@ -101,11 +101,27 @@ export const LoadGeometry = (gl, program, vertData, indices) => {
 
   const vertPosIndex = gl.getAttribLocation(program, 'aVertPos');
   gl.enableVertexAttribArray(vertPosIndex);
-  gl.vertexAttribPointer(vertPosIndex, 4, gl.FLOAT, false, 6 * FLOAT_BYTE_SIZE, 0);
+  gl.vertexAttribPointer(
+    vertPosIndex,
+    vertComponentNum,
+    gl.FLOAT,
+    false,
+    (vertComponentNum + texCoordComponentNum) * FLOAT_BYTE_SIZE,
+    0
+  );
 
-  const texCoordsIndex = gl.getAttribLocation(program, 'aTexCoords');
-  gl.enableVertexAttribArray(texCoordsIndex);
-  gl.vertexAttribPointer(texCoordsIndex, 2, gl.FLOAT, false, 6 * FLOAT_BYTE_SIZE, 4 * FLOAT_BYTE_SIZE);
+  if (texCoordComponentNum > 0) {
+    const texCoordsIndex = gl.getAttribLocation(program, 'aTexCoords');
+    gl.enableVertexAttribArray(texCoordsIndex);
+    gl.vertexAttribPointer(
+      texCoordsIndex,
+      texCoordComponentNum,
+      gl.FLOAT,
+      false,
+      (vertComponentNum + texCoordComponentNum) * FLOAT_BYTE_SIZE,
+      vertComponentNum * FLOAT_BYTE_SIZE
+    );
+  }
 };
 
 export const getViewWidthHeightAtZ = (fovY, aspect, zPos) => {

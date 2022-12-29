@@ -1,4 +1,4 @@
-import { DEG_TO_RAD } from './vectorMath';
+import { DEG_TO_RAD } from '../vectorMath';
 
 // Creates sphere vertex data given a number of segments and rings
 export const SphereModel = (segments, rings, radius) => {
@@ -223,4 +223,14 @@ export const CubeModel = (sideLength) => {
   // TODO:
   // front, half of left, bottom, back, right, top, second half of left
   return { vertData, indices };
+};
+
+// generate a bevelled base for a model to sit on for the turntable
+export const TurntableBase = (sections, radius) => {
+  let vertData = [];
+  let indices = [];
+  
+  for (let i = 0; i < sections; ++i) {
+
+  }
 };

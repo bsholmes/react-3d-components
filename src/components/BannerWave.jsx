@@ -6,7 +6,7 @@ import {
   LoadGeometry,
   getViewWidthHeightAtZ
 } from '../common/utils';
-import { PlaneModel } from '../common/proceduralMeshes';
+import { PlaneModel } from '../common/geometry/proceduralMeshes';
 import {
   mat4Mult,
   ProjectionMatrix,
@@ -18,7 +18,7 @@ import panoFragmentShader from '../shaders/panoFragmentShader.glsl';
 // plane mesh with several horizontal segments
 // animate waving
 
-const CAM_POS = [0, 0, -1, 0];
+const CAM_POS = [0, 0, -0.1, 0];
 const CAM_TARGET = [0, 0, 1, 0];
 const CAM_UP = [0, 1, 0, 0];
 

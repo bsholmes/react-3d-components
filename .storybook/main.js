@@ -21,6 +21,11 @@ module.exports = {
       use: ['webpack-glsl-loader'],
     });
 
+    config.module.rules.push({
+      test: /\.obj$/,
+      use: ['raw-loader'],
+    });
+
     // Return the altered config
     return config;
   },

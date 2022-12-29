@@ -111,10 +111,10 @@ export const ViewMatrix = (camPos, targetPos, upDir) => {
   const y = vec4Normalize(vec4Cross(z, vec4Scale(x, -1)));
 
   return mat4Transpose([
-    x[0], x[1], x[2], 0,
-    y[0], y[1], y[2], 0,
-    z[0], z[1], z[2], 0,
-    -camPos[0], -camPos[1], -camPos[2], 1
+    x[0], x[1], x[2], -camPos[0],
+    y[0], y[1], y[2], -camPos[1],
+    z[0], z[1], z[2], -camPos[2],
+    0,    0,    1,    1
   ]);
 };
 
